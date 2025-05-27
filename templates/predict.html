@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Predict Land Prices</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <style>
+       body {
+           background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20190221/ourmid/pngtree-light-green-green-light-green-bloom-image_11709.jpg');
+           background-size: cover;
+           font-family: 'Roboto', sans-serif;
+           color: #f0fff0;
+           margin: 0;
+           padding: 0;
+       }
+       header {
+           background-color: #00703C;
+           padding: 20px;
+           text-align: center;
+           font-size: 24px;
+           color: #f0fff0;
+       }
+       nav a {
+           color: #f0fff0;
+           text-decoration: none;
+           margin: 0 10px;
+           font-size: 18px;
+       }
+       main {
+           text-align: center;
+           padding: 50px 20px;
+       }
+       form {
+           background-color: rgba(0, 112, 60, 0.8);
+           padding: 20px;
+           border-radius: 10px;
+           display: inline-block;
+       }
+       label, input, select {
+           font-size: 18px;
+           color: #fff;
+           margin-bottom: 10px;
+           display: block;
+       }
+       input, select {
+           padding: 10px;
+           width: 80%;
+           border: none;
+           border-radius: 5px;
+           color: black;
+           background-color: white;
+       }
+       button {
+           background-color: rgb(97, 219, 152);
+           color: #fff;
+           border: none;
+           padding: 10px 20px;
+           font-size: 16px;
+           cursor: pointer;
+           border-radius: 5px;
+       }
+       button:hover {
+           background-color: rgb(15, 175, 100);
+       }
+       ul {
+           list-style: none;
+           padding: 0;
+       }
+       ul li {
+           background-color: rgba(0, 112, 60, 0.8);
+           padding: 10px;
+           margin: 5px;
+           border-radius: 5px;
+           font-size: 18px;
+       }
+       h3.prediction-title {
+           color: rgb(15, 175, 100);
+           font-size: 22px;
+           margin-top: 20px;
+       }
+       canvas {
+           background-color: white;
+           border-radius: 10px;
+           margin-top: 30px;
+           padding: 10px;
+       }
+       footer {
+           background-color: #00703C;
+           padding: 10px;
+           text-align: center;
+           color: #f0fff0;
+       }
+       .land-type-badge {
+           display: inline-block;
+           background-color: rgba(97, 219, 152, 0.3);
+           padding: 3px 8px;
+           border-radius: 5px;
+           margin-left: 10px;
+           font-size: 0.8em;
+       }
+   </style>
+</head>
+<body>
+   <header>
+       <h1>Explore Future Land Price Trends</h1>
+       <nav>
+           <a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a>
+       </nav>
+   </header>
+
+   <main>
+    <form method="POST" action="{{ url_for('predict') }}">
+        <label for="area">Enter Area Name:</label>
+        <input type="text" id="area" name="area" required>
+        <label for="land_type">Select Land Type:</label>
+        <select id="land_type" name="land_type" required>
+            <option value="Commercial">Commercial</option>
+            <option value="Residential">Residential</option>
+            <option value="Industrial">Industrial</option>
+            <option value="Recreational">Recreational</option>
+            <option value="Agricultural">Agricultural</option>
+            <option value="Forest">Forest</option>
+            <option value="Wetlands">Wetlands</option>
+            <option value="Institutional">Institutional</option>
+            <option value="Barren">Barren</option>
+        </select>
+        <button type="submit">Predict</button>
+    </form>
+
+       {% if error %}
+           <p style="color: red;">{{ error }}</p>
+       {% endif %}
+
+       {% if inflated_prices %}
+           <h3 class="prediction-title">Predicted Prices for {{ area }} <span class="land-type-badge">{{ land_type }}</span> (Next 5 Years)</h3>
+           <ul>
+               {% set current_year = 2025 %}
+               {% for price in inflated_prices %}
+                   <li>Year {{ current_year }}: ₹{{ price | round(2) }} /sq.ft</li>
+                   {% set current_year = current_year + 1 %}
+               {% endfor %}
+           </ul>
+           <canvas id="priceChart" width="600" height="300"></canvas>
+           <script>
+               const years = {{ years | tojson }};
+               const values = {{ inflated_prices | tojson }};
+
+               const ctx = document.getElementById('priceChart').getContext('2d');
+               new Chart(ctx, {
+                   type: 'line',
+                   data: {
+                       labels: years.map(y => 'Year ' + y),
+                       datasets: [{
+                           label: 'Predicted Price (₹)',
+                           data: values,
+                           borderColor: 'rgba(75, 192, 192, 1)',
+                           backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                           fill: true,
+                           tension: 0.3
+                       }]
+                   },
+                   options: {
+                       responsive: true,
+                       scales: {
+                           y: {
+                               beginAtZero: false,
+                               title: { display: true, text: 'Price in ₹' }
+                           },
+                           x: {
+                               title: { display: true, text: 'Years' }
+                           }
+                       }
+                   }
+               });
+           </script>
+       {% endif %}
+
+       {% if lr_predictions and rf_predictions and knn_predictions %}
+           <h3 class="prediction-title">Model-wise Predictions <span class="land-type-badge">{{ land_type }}</span></h3>
+           <ul>
+               <li><strong>Linear Regression:</strong> ₹{{ lr_predictions | round(2) }} /sq.ft</li>
+               <li><strong>Random Forest:</strong> ₹{{ rf_predictions | round(2) }} /sq.ft</li>
+               <li><strong>KNN Regressor:</strong> ₹{{ knn_predictions | round(2) }} /sq.ft</li>
+           </ul>
+       {% endif %}
+
+       {% if predictions %}
+           <h3 class="prediction-title">Detailed Prediction for {{ area }} <span class="land-type-badge">{{ land_type }}</span></h3>
+           <p><strong>Predicted Price:</strong> ₹{{ predictions.predicted_price | round(2) }} /sq.ft</p>
+           <p><strong>Cluster:</strong> {{ predictions.cluster }}</p>
+
+           {% if area %}
+               <img src="{{ url_for('static', filename=area + '_trend.png') }}" alt="Trend Plot" style="margin-top: 20px; max-width: 80%; border-radius: 10px;">
+           {% endif %}
+       {% endif %}
+   </main>
+   <script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const areaInput = document.getElementById('area');
+        if (!areaInput.value.trim()) {
+            e.preventDefault();
+            alert('Please enter an area name');
+            areaInput.focus();
+        }
+    });
+</script>
+   <footer>
+       <p>&copy; 2025 Land Price Prediction. All rights reserved.</p>
+   </footer>
+</body>
+</html>

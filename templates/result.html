@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20190221/ourmid/pngtree-light-green-green-light-green-bloom-image_11709.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 900px;
+            margin: 30px auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #00703C;
+            margin-top: 0;
+            text-align: center;
+            font-size: 28px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #00703C;
+        }
+
+        .current-price {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .price-plot {
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .prediction-section {
+            margin-top: 30px;
+        }
+
+        .prediction-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .prediction-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .year {
+            font-weight: 600;
+            width: 80px;
+        }
+
+        .price {
+            font-weight: 500;
+        }
+
+        .back-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto 0;
+            padding: 12px;
+            background-color: #00703C;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #005a31;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .factors-section {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .factors-section h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 22px;
+        }
+
+        .factors-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .factors-table th, .factors-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .factors-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .factors-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .linear-regression .prediction-header { color: #3498db; }
+        .random-forest .prediction-header { color: #e74c3c; }
+        .knn-regressor .prediction-header { color: #f39c12; }
+        .corrected-avg .prediction-header { color: #27ae60; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <h2>Land Price Prediction for {{ data.area }}</h2>
+
+        <div class="current-price">
+            <p>Current Average Price: <strong>₹{{ "%.2f"|format(data.current_price) }}/sq.ft</strong></p>
+        </div>
+
+        {% if data.plot_data %}
+        <div class="plot-section">
+            <img src="data:image/png;base64,{{ data.plot_data }}" alt="Price Prediction Plot" class="price-plot">
+        </div>
+        {% endif %}
+
+        <div class="prediction-section">
+            {% for prediction in data.predictions %}
+            <div class="prediction-card {% if prediction['name'] == 'Linear Regression' %}linear-regression{% elif prediction['name'] == 'Random Forest' %}random-forest{% elif prediction['name'] == 'KNN Regressor' %}knn-regressor{% else %}corrected-avg{% endif %}">
+                <div class="prediction-header">
+                    {{ prediction['name'] }}
+                </div>
+                {% for i in range(data.years | length) %}
+                <div class="price-row">
+                    <span class="year">{{ data.years[i] }}:</span>
+                    <span class="price">₹{{ "%.2f"|format(prediction['values'][i]) }}/sq.ft</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+                
+        </div>
+
+        <a href="{{ url_for('predict') }}" class="back-btn">Explore Again</a>
+    </div>
+
+    <div class="factors-section">
+        <h3>Key Factors Influencing Land Price</h3>
+        <table class="factors-table">
+            <thead>
+                <tr>
+                    <th>Time Period</th>
+                    <th>Feature</th>
+                    <th>Importance Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Previous Year (2024)</td>
+                    <td>1 prev land price</td>
+                    <td>{{ "%.4f"|format(factors[0]['importance']) }}</td>
+                </tr>
+                <tr>
+                    <td>Two Years Prior (2023)</td>
+                    <td>2 prev land price</td>
+                    <td>{{ "%.4f"|format(factors[2]['importance']) }}</td>
+                </tr>
+                <tr>
+                    <td>2006</td>
+                    <td>2006 Price</td>
+                    <td>{{ "%.4f"|format(factors[1]['importance']) }}</td>
+                </tr>
+                <tr>
+                    <td>2007</td>
+                    <td>2007 Price</td>
+                    <td>{{ "%.4f"|format(factors[3]['importance']) }}</td>
+                </tr>
+                <tr>
+                    <td>2008</td>
+                    <td>2008 Price</td>
+                    <td>{{ "%.4f"|format(factors[4]['importance']) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>  

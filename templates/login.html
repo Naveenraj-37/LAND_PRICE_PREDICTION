@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20190221/ourmid/pngtree-light-green-green-light-green-bloom-image_11709.jpg');
+            background-size: cover;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #00703C;
+            padding: 20px;
+            font-size: 24px;
+        }
+        main {
+            margin: 50px auto;
+            width: 300px;
+            padding: 30px;
+            background: #00703C;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background-color: rgb(97, 219, 152);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color:rgb(15, 175, 100);
+        }
+        a {
+            color: #f0fff0;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Login</h1>
+    </header>
+    <main>
+        <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+            <label for="email">Email ID:</label>
+            <input type="email" id="email" name="email" required>
+        
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        
+            <small style="display: block; margin-bottom: 10px;">
+                Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.
+            </small>
+        
+            <div style="background-color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: black;">
+                <label for="role" style="display: block; margin-bottom: 5px;">Login As:</label>
+                <select id="role" name="role" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                    <option value="">Select Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                </select>
+            </div>
+        
+            <button type="submit">Login</button>
+        </form>
+        
+
+        <p>Don't have an account? <a href="{{ url_for('register') }}">Sign up here</a></p>
+    </main>
+
+    <script>
+        document.getElementById('loginForm').onsubmit = function() {
+            const password = document.getElementById('password').value;
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordPattern.test(password)) {
+                alert('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.');
+                return false;
+            }
+            return true;
+        };
+    </script>
+</body>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Results for {{ area }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20190221/ourmid/pngtree-light-green-green-light-green-bloom-image_11709.jpg');
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            color: #f0fff0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #00703C;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+        }
+        .summary-card {
+            background-color: rgba(20, 83, 45, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            color: #fff;
+        }
+        .summary-item {
+            margin-bottom: 10px;
+        }
+        .summary-label {
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #fff;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #fff;
+            text-align: center;
+        }
+        .up {
+            color: #00ff99;
+        }
+        .down {
+            color: #ff6666;
+        }
+        .potential-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .high {
+            background-color: #28a745;
+        }
+        .medium {
+            background-color: #ffc107;
+        }
+        .low {
+            background-color: #dc3545;
+        }
+        .action-buttons {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            text-decoration: none;
+            background-color: rgb(97, 219, 152);
+            color: #fff;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: rgb(15, 175, 100);
+        }
+        .no-results {
+            background-color: rgba(255, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            color: #fff;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Land Price Results</h1>
+    </header>
+
+    <div class="container">
+        <div class="search-criteria">
+            <p><strong>Search Criteria:</strong></p>
+            <ul>
+                <li>Area: {{ area if area and area != 'All' else 'All Areas' }}</li>
+                <li>Land Use Type: {{ land_use_type if land_use_type and land_use_type != 'All' else 'All Types' }}</li>
+            </ul>
+        </div>
+
+        {% if no_results %}
+        <div class="no-results">
+            <p>No properties found matching your search criteria.</p>
+            <p>Try broadening your search filters.</p>
+        </div>
+        {% else %}
+        <div class="summary-card">
+            <div class="summary-item">
+                <span class="summary-label">Average Current Price</span>:
+                ₹{{ "{:,.2f}".format(current_avg) }}/sq.ft
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Properties Found</span>:
+                {{ results|length }}
+            </div>
+        </div>
+
+        <div class="table-container">
+           <table>
+    <thead>
+        <tr>
+            <th>Area</th>
+            <th>Land Use</th>
+            <th>Current Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in results %}
+        <tr>
+            <td>{{ result.Area }}</td>
+            <td>{{ result['Land Use Type'] }}</td>
+            <td>{{ result['Land Price (?/sq.ft)'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+        </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{{ url_for('search.search') }}" class="btn">New Search</a>
+        </div>
+    </div> 
+</body>
+</html>

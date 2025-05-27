@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add News</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20190221/ourmid/pngtree-light-green-green-light-green-bloom-image_11709.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Roboto', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #00703C;
+      padding: 20px;
+      font-size: 24px;
+      text-align: center;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 10;
+    }
+    header nav {
+      margin-top: 10px;
+    }
+    header a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+    }
+    header a:hover {
+      text-decoration: underline;
+    }
+    main {
+      padding: 120px 20px 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 16px;
+    }
+    button {
+      background-color: #00703C;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005f32;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+    .flash-message {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Post News
+    <nav>
+      <a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a>
+    </nav>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p class="flash-message" style="color: {% if category == 'success' %}lightgreen{% else %}#ff4d4d{% endif %};">
+            {{ message }}
+          </p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('notification') }}" method="POST">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" placeholder="Enter news title" required>
+
+      <label for="content">Content:</label>
+      <textarea id="content" name="content" placeholder="Write the news content here..." rows="6" required></textarea>
+
+      <label for="region">Region:</label>
+      <input type="text" id="region" name="region" placeholder="Target region" required>
+
+      <button type="submit">Post News</button>
+    </form>
+  </main>
+</body>
+</html>

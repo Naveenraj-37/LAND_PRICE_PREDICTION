@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Land Price Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20190221/ourmid/pngtree-light-green-green-light-green-bloom-image_11709.jpg');
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #00703C;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .half-width {
+            flex: 1;
+        }
+        .form-actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .primary {
+            background-color: rgb(97, 219, 152);
+            color: white;
+        }
+        .secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Chennai Land Price Search</h1>
+    </header>
+
+    <div class="container">
+        <form action="{{ url_for('search.search') }}" method="POST" class="search-form">
+            <div class="form-group">
+                <label for="area">Select Area:</label>
+                <select name="area" id="area" class="form-control">
+                    <option value="All">-- All Areas --</option>
+                    {% for area in areas %}
+                        <option value="{{ area }}">{{ area }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="land_use_type">Land Use Type:</label>
+                <select name="land_use_type" id="land_use_type" class="form-control">
+                    <option value="All">-- All Types --</option>
+                    {% for land_use_type in land_use_types %}
+                        <option value="{{ land_use_type }}">{{ land_use_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="min_price">Min Price (₹/sq.ft):</label>
+                    <input type="number" id="min_price" name="min_price" placeholder="Any" min="0" step="0.01" class="form-control">
+                </div>
+                <div class="form-group half-width">
+                    <label for="max_price">Max Price (₹/sq.ft):</label>
+                    <input type="number" id="max_price" name="max_price" placeholder="Any" min="0" step="0.01" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn primary">Search</button>
+                <button type="reset" class="btn secondary">Clear</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

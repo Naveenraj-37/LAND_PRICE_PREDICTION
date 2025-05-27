@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>FAQ Module</title>
+    <style>
+        body {
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20190221/ourmid/pngtree-light-green-green-light-green-bloom-image_11709.jpg');
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            color: #f0fff0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #00703C;
+            padding: 20px;
+            text-align: center;
+        }
+        nav a {
+            color: #f0fff0;
+            text-decoration: none;
+            margin: 10px;
+            font-weight: bold;
+        }
+        main {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgb(33, 190, 104);
+        }
+        button {
+            background-color: rgb(97, 219, 152);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: rgb(15, 175, 100);
+        }
+        footer {
+            background-color: #00703C;
+            padding: 10px;
+            text-align: center;
+            color: #f0fff0;
+        }
+
+        .faq-section {
+            max-width: 600px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+        }
+
+        .faq-question {
+            cursor: pointer;
+            color: #00703C;
+            margin: 0;
+        }
+
+        .faq-answer {
+            display: none; /* Initially hide answers */
+            margin-top: 5px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #00703C;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>FAQ Module</h1>
+        <nav>
+            <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
+        </nav>
+    </header>
+    <main>
+        <div class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            {% for faq in faqs %}
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer({{ faq.id }})">{{ faq.question }}</h3>
+                <div class="faq-answer" id="answer-{{ faq.id }}">
+                    <p>{{ faq.answer }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Land Price Prediction. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const answer = document.getElementById(`answer-${id}`);
+            answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
